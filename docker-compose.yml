@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: servicarpro_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: servicar_user
+      POSTGRES_PASSWORD: servicar_pass
+      POSTGRES_DB: servicarpro_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
+
+  gateway:
+    build: ./gateway
+    container_name: servicarpro_gateway
+    ports:
+      - "8000:8000"
+    environment:
+      PORT_GATEWAY: 8000
+    depends_on:
+      - postgres
+
+  ms-customers:
+    build: ./services/customers-vehicles
+    container_name: servicarpro_ms_customers
+    ports:
+      - "3001:3001"
+    environment:
+      PORT_CUSTOMERS: 3001
+      DB_HOST: postgres
+      DB_USER: servicar_user
+      DB_PASSWORD: servicar_pass
+      DB_NAME: servicarpro_db
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
