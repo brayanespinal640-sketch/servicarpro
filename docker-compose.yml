@@ -39,7 +39,21 @@ services:
     depends_on:
       - postgres
 
-frontend:
+  ms-inventory:
+    build: ./services/inventory
+    container_name: servicarpro_ms_inventory
+    ports:
+      - "3003:3003"
+    environment:
+      PORT_INVENTORY: 3003
+      DB_HOST: postgres
+      DB_USER: servicar_user
+      DB_PASSWORD: servicar_pass
+      DB_NAME: servicarpro_db
+    depends_on:
+      - postgres
+
+  frontend:
     build: ./frontend
     container_name: servicarpro_frontend
     ports:
